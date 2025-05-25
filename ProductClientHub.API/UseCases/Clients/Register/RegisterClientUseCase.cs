@@ -1,5 +1,6 @@
 ﻿using ProductClientHub.Communication.Requests;
 using ProductClientHub.Communication.Responses;
+using ProductClientHub.Exceptions.ExceptionsBase;
 
 namespace ProductClientHub.API.UseCases.Clients.Register
 {
@@ -12,7 +13,7 @@ namespace ProductClientHub.API.UseCases.Clients.Register
 
             if (!result.IsValid)
             {
-                throw new ArgumentException("Erro nos dados recebidos");
+                throw new ProductClientHubException("Erro nos dados recebidos");
             }
 
 
