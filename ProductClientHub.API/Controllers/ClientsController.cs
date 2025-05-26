@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ProductClientHub.API.UseCases.Clients.GetAll;
 using ProductClientHub.API.UseCases.Clients.Register;
+using ProductClientHub.API.UseCases.Clients.Update;
 using ProductClientHub.Communication.Requests;
 using ProductClientHub.Communication.Responses;
 
@@ -10,7 +12,7 @@ namespace ProductClientHub.API.Controllers
     public class ClientsController : ControllerBase
     {
         [HttpPost]
-        [ProducesResponseType(typeof(ResponseClientJson), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ResponseShortClientJson), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status400BadRequest)]
         public IActionResult Register([FromBody] RequestClientJson request)
         {
@@ -21,16 +23,25 @@ namespace ProductClientHub.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(Guid id)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status400BadRequest)]
+        public IActionResult Update([FromRoute] Guid id, [FromBody] RequestClientJson request)
         {
-            // Use the 'id' parameter or remove it if not needed.
-            return Ok($"Client with ID {id} updated successfully.");
+            var useCase = new UpdateClientUseCase();
+            useCase.Execute(id, request);
+
+            return NoContent();
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(ResponseAllClientsJson), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IActionResult GetAll()
         {
-            return Ok("All clients retrieved successfully.");
+            var useCase = new GetAllClientsUseCase();
+            var response = useCase.Execute();
+            if (response.Clients.Count == 0) return NoContent();
+            return Ok(response);
         }
 
         [HttpGet]

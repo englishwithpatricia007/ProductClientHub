@@ -1,45 +1,38 @@
-﻿using ProductClientHub.API.Entities;
-using ProductClientHub.API.Infrastructure;
+﻿using ProductClientHub.API.Infrastructure;
 using ProductClientHub.API.UseCases.Clients.SharedValidator;
 using ProductClientHub.Communication.Requests;
-using ProductClientHub.Communication.Responses;
 using ProductClientHub.Exceptions.ExceptionsBase;
 
-namespace ProductClientHub.API.UseCases.Clients.Register
+namespace ProductClientHub.API.UseCases.Clients.Update
 {
-    public class RegisterClientUseCase
+    public class UpdateClientUseCase
     {
-        public ResponseShortClientJson Execute(RequestClientJson request)
+        public void Execute(Guid id, RequestClientJson request)
         {
             Validate(request);
-
             var dbContext = new ProductClientHubDbContext();
-            var entity = new Client
+            var entity = dbContext.Clients.FirstOrDefault(c => c.Id == id);
+            if(entity is null)
             {
-                Email = request.Email,
-                Name = request.Name,                
-            };
-            
-            dbContext.Clients.Add(entity);
+                throw new NotFoundException("Cliente não encontrado");
+            }
+
+            entity.Email = request.Email;   
+            entity.Name = request.Name;
+            dbContext.Clients.Update(entity);
             dbContext.SaveChanges();
 
-            return new ResponseShortClientJson{
-                Id = entity.Id,
-                Name = entity.Name,
-            };
         }
 
         private void Validate(RequestClientJson request)
         {
             var validator = new RequestClientValidator();
             var result = validator.Validate(request);
-
             if (!result.IsValid)
             {
                 var errors = result.Errors
                     .Select(error => error.ErrorMessage)
                     .ToList(); // Simplified collection initialization
-
                 throw new ErrorOnValidationException(errors);
             }
         }
