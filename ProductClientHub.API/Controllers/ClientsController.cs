@@ -23,7 +23,8 @@ namespace ProductClientHub.API.Controllers
 
             catch (ProductClientHubException ex)
             {
-                return BadRequest(new ResponseErrorMessagesJson(ex.Message));
+                var errors = ex.GetErrors();
+                return BadRequest(new ResponseErrorMessagesJson(errors));
             }
             catch (Exception)
             {

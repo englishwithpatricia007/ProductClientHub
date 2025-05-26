@@ -13,9 +13,12 @@ namespace ProductClientHub.API.UseCases.Clients.Register
 
             if (!result.IsValid)
             {
-                throw new ProductClientHubException("Erro nos dados recebidos");
-            }
+                var errors = result.Errors
+                    .Select(error => error.ErrorMessage)
+                    .ToList(); // Simplified collection initialization
 
+                throw new ErrorOnValidationException(errors);
+            }
 
             return new ResponseClientJson();
         }
