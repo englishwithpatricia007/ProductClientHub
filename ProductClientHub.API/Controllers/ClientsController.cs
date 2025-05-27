@@ -2,6 +2,7 @@
 using ProductClientHub.API.UseCases.Clients.GetAll;
 using ProductClientHub.API.UseCases.Clients.Register;
 using ProductClientHub.API.UseCases.Clients.Update;
+using ProductClientHub.API.UseCases.Products.Delete;
 using ProductClientHub.Communication.Requests;
 using ProductClientHub.Communication.Responses;
 
@@ -54,10 +55,15 @@ namespace ProductClientHub.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(Guid id)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ResponseErrorMessagesJson), StatusCodes.Status404NotFound)]
+        public IActionResult Delete([FromRoute] Guid id)
         {
-            // Use the 'id' parameter or remove it if not needed.
-            return Ok($"Client with ID {id} deleted successfully.");
+            var useCase = new DeleteProductUseCase();
+            useCase.Execute(id);
+            return NoContent();
         }
+
     }
+
 }
